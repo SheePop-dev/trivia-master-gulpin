@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html>
-<body style="color:white;background:black;">
+<style>
+* {
+  color: white;
+  text-shadow: black 2px 2px;
+  text-align: center;
+  transition-duration: 0.5s;
+  font-size: 120%;
+}
+</style>
+
+<body>
   <div id="full">
     <h1 id="category">Category</h1>
     <p id="question">question</p>
@@ -16,11 +26,18 @@
 // shiny gulpin chance
 // fan-made trivia questions
 // list of punishments (TOTK Bingo: drop all weapons | unequip all armor for 10 minutes | transfer shiny pokemon to chat | increase chance of Gulpin by 5% permanently | next question is read in jumbled words | buy a salmon | give greg VIP | stop and help 3 koroks | shrine blindfolded | increase voice pitch by 1 octave | curse | bee movie | speak in spanish for 5 minutes | open tart packs | speeddraw a new tart card | Get 5 fish rn | Get first place in Mario Kart on 150cc | Do the next shrine you see | block half the screen | 
+
 var punishments_totk = ["Drop all weapons", "No armor until next question", "Only move by jumping until the next question", "Stop what you're doing and help a Korok", "Stop what you're doing and complete a shrine", "Speak Spanish until the next question", "Increase voice by 1 octave until next question", "Stop what you're doing and draw a Tart Wars card"];
 var punishments_repeatable = [];
+
 speakText(0, "It's Question Time!");
 let correctAnswer = "";
+
 async function loadQuestion() {
+  document.getElementById("answer0").style.display = "inline";
+  document.getElementById("answer1").style.display = "inline";
+  document.getElementById("answer2").style.display = "inline";
+  document.getElementById("answer3").style.display = "inline";
   document.getElementById("full").style.opacity = "1";
   document.getElementById("question").innerHTML = "";
   document.getElementById("punishment").innerHTML = "";
@@ -57,10 +74,19 @@ function checkAnswer(int) {
   if (selectedAnswer == correctAnswer) {
     result = "That's correct! You're safe. For now."
   } else {
-    result = "WRONG! The correct answer was " + correctAnswer + ". Your punishment is: " + punishments_totk[Math.floor(Math.random() * punishments_totk.length) + 1];
+    result = "WRONG! The correct answer was " + correctAnswer + ". Your punishment is: " + punishments_totk[Math.floor(Math.random() * punishments_totk.length)];
   }
   document.getElementById("punishment").innerHTML = result;
+  document.getElementById("question").innerHTML = " ";
+  document.getElementById("category").innerHTML = " ";
+  document.getElementById("answer0").style.display = "none";
+  document.getElementById("answer1").style.display = "none";
+  document.getElementById("answer2").style.display = "none";
+  document.getElementById("answer3").style.display = "none";
   speakText(0, result);
+  setTimeout(function() {
+    document.getElementById("punishment").innerHTML = "";
+  }, 5000);
 }
 
 function decode(val) {
@@ -105,8 +131,9 @@ function speakText(val, sentence) {
       document.getElementById("question").innerHTML += text + " ";
     }
     utter.onstart = () => {
-      document.getElementById("gulpin-yap").style.display = "block";
+      document.getElementById("gulpin-yap").style.opacity = "1";
     };
+    
     utter.onend = () => {
       i++;
       if (i < parts.length) {
@@ -114,7 +141,7 @@ function speakText(val, sentence) {
         document.getElementById("question").innerHTML += "GULPIN ";
         audio.play();
       } else {
-        document.getElementById("gulpin-yap").style.display = "none";
+        document.getElementById("gulpin-yap").style.opacity = "0";
       }
     };
     speechSynthesis.speak(utter);
@@ -125,7 +152,7 @@ function speakText(val, sentence) {
 loadQuestion();
 setInterval(function() {
   loadQuestion();
-}, 30000);
+}, 300000);
 
 </script>
 </body>
