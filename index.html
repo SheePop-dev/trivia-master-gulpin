@@ -1,66 +1,51 @@
 <!DOCTYPE html>
 <html>
-<body>
-  <h1 id="category">Category</h1>
-  <p id="question">question</p>
-  <button id="answer0" onClick="checkAnswer(0)">0</button>
-  <button id="answer1" onClick="checkAnswer(1)">1</button>
-  <button id="answer2" onClick="checkAnswer(2)">2</button>
-  <button id="answer3" onClick="checkAnswer(3)">3</button>
-
-
+<body style="color:white;background:black;">
+  <div id="full">
+    <h1 id="category">Category</h1>
+    <p id="question">question</p>
+    <button id="answer0" onClick="checkAnswer(0)">0</button>
+    <button id="answer1" onClick="checkAnswer(1)">1</button>
+    <button id="answer2" onClick="checkAnswer(2)">2</button>
+    <button id="answer3" onClick="checkAnswer(3)">3</button>
+    <div id="punishment"></div>
+    <img id="gulpin-yap" src="https://raw.githubusercontent.com/SheePop-dev/trivia-master-gulpin/refs/heads/main/gulpin-yap.gif">
+  </div>
 <script>
 // things to add 
 // shiny gulpin chance
 // fan-made trivia questions
-// list of punishments (TOTK Bingo: drop all weapons | unequip all armor for 10 minutes | transfer shiny pokemon to chat | increase chance of Gulpin by 5% permanently | next question is read in jumbled words | buy a salmon | give greg VIP | stop and help 3 koroks | shrine blindfolded | increase voice pitch by 1 octave | curse | bee movie | speak in spanish for 5 minutes | open tart packs | speeddraw a new tart card | 
-
-const soundURL = "https://play.pokemonshowdown.com/audio/cries/gulpin.mp3";
+// list of punishments (TOTK Bingo: drop all weapons | unequip all armor for 10 minutes | transfer shiny pokemon to chat | increase chance of Gulpin by 5% permanently | next question is read in jumbled words | buy a salmon | give greg VIP | stop and help 3 koroks | shrine blindfolded | increase voice pitch by 1 octave | curse | bee movie | speak in spanish for 5 minutes | open tart packs | speeddraw a new tart card | Get 5 fish rn | Get first place in Mario Kart on 150cc | Do the next shrine you see | block half the screen | 
+var punishments_totk = ["Drop all weapons", "No armor until next question", "Only move by jumping until the next question", "Stop what you're doing and help a Korok", "Stop what you're doing and complete a shrine", "Speak Spanish until the next question", "Increase voice by 1 octave until next question", "Stop what you're doing and draw a Tart Wars card"];
+var punishments_repeatable = [];
+speakText(0, "It's Question Time!");
 let correctAnswer = "";
-
 async function loadQuestion() {
+  document.getElementById("full").style.opacity = "1";
   document.getElementById("question").innerHTML = "";
-  //category, question, incorrect_answers, correct_answer
+  document.getElementById("punishment").innerHTML = "";
   const res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
   const data = await res.json();
   const q = data.results[0];
-  
   const category = decode(q.category);
   const question = decode(q.question);
   const correct_answer = decode(q.correct_answer);
   correctAnswer = correct_answer;
-  
-  
-  
-  
+  speakText(0, "The category is " + category);
   let all_answers = q.incorrect_answers.map(a => decode(a));
   all_answers.push(correct_answer);
   all_answers = shuffle(all_answers);
-
-  
   document.getElementById("category").innerHTML = category;
-  
-  
   const questionWordsArray = question.split(" ");
-
-  
   var i = 0;
-  
+  var gulpinQuestion = "";
   for(i=0;i<questionWordsArray.length;i++) {
-
     if (Math.random() <= .20) {
       questionWordsArray[i] = "GULPIN";
     }
-    
-    
-      document.getElementById("question").innerHTML += questionWordsArray[i] + " ";
-      await speakText(questionWordsArray[i]);
+    gulpinQuestion += questionWordsArray[i] + " ";
   }
-  
-  const gulpinQuestion = document.getElementById("question").innerHTML;
-  
-  //speakText("Category is " + category + " . " + gulpinQuestion);
-  
+  speakText(1, gulpinQuestion);
   for(i=0;i<4;i++) {
     document.getElementById("answer" + i).innerHTML = all_answers[i];
   }
@@ -68,13 +53,14 @@ async function loadQuestion() {
 
 function checkAnswer(int) {
   const selectedAnswer = document.getElementById("answer" + int).innerHTML;
-  
+  let result = "";
   if (selectedAnswer == correctAnswer) {
-    alert("correct!");
+    result = "That's correct! You're safe. For now."
   } else {
-    alert("incorrect!");
+    result = "WRONG! The correct answer was " + correctAnswer + ". Your punishment is: " + punishments_totk[Math.floor(Math.random() * punishments_totk.length) + 1];
   }
-  
+  document.getElementById("punishment").innerHTML = result;
+  speakText(0, result);
 }
 
 function decode(val) {
@@ -92,38 +78,54 @@ function shuffle(array) {
 }
 
 function playSound(url) {
-   return new Promise(resolve => {
-       const audio = new Audio(url);
-       audio.onended = resolve;
-       audio.onerror = resolve;
-       audio.play().catch(resolve);
-   });
-}
-
-function speakText(text) {
-  if (text == "GULPIN") {
-    
-    playSound(soundURL);
-    
-  } else {
-
-    return new Promise(resolve => {
-     const utter = new SpeechSynthesisUtterance(text);
-     // utterance.voice = voices[21];
-     utter.onend = resolve;
-     utter.onerror = resolve;
-     speechSynthesis.speak(utter);
-    });
-  }
+  return new Promise(resolve => {
+    const audio = new Audio(url);
+    audio.onended = resolve;
+    audio.onerror = resolve;
+    audio.play().catch(resolve);
+  });
 }
 
 function sleep(ms) {
-   return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
+function speakText(val, sentence) {
+  const keyword = "GULPIN";
+  const audio = new Audio("https://play.pokemonshowdown.com/audio/cries/gulpin.mp3");
+  const parts = sentence.split(keyword);
+  let i = 0;
+  function next() {
+    if (i >= parts.length) return;
+    const text = parts[i].trim();
+    const utter = new SpeechSynthesisUtterance(text);
+    const voices = speechSynthesis.getVoices();
+    utter.voice = voices[3];
+    if (val == 1) {
+      document.getElementById("question").innerHTML += text + " ";
+    }
+    utter.onstart = () => {
+      document.getElementById("gulpin-yap").style.display = "block";
+    };
+    utter.onend = () => {
+      i++;
+      if (i < parts.length) {
+        audio.onended = next;
+        document.getElementById("question").innerHTML += "GULPIN ";
+        audio.play();
+      } else {
+        document.getElementById("gulpin-yap").style.display = "none";
+      }
+    };
+    speechSynthesis.speak(utter);
+  }
+  next();
+}
 
 loadQuestion();
+setInterval(function() {
+  loadQuestion();
+}, 30000);
 
 </script>
 </body>
