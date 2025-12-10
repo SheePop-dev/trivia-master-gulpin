@@ -73,8 +73,10 @@ function checkAnswer(int) {
   let result = "";
   if (selectedAnswer == correctAnswer) {
     result = "That's correct! You're safe. For now."
+    playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/correct.mp3?raw=true");
   } else {
     result = "WRONG! The correct answer was " + correctAnswer + ". Your punishment is: " + punishments_totk[Math.floor(Math.random() * punishments_totk.length)];
+    playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/incorrect.mp3?raw=true");
   }
   document.getElementById("punishment").innerHTML = result;
   document.getElementById("question").innerHTML = " ";
