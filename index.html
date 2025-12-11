@@ -8,32 +8,66 @@
   transition-duration: 0.5s;
   font-size: 120%;
 }
+
+button {
+  background: none;
+}
+
 </style>
 
 <body>
   <div id="full">
     <h1 id="category">Category</h1>
     <p id="question">question</p>
-    <button id="answer0" onClick="checkAnswer(0)">0</button>
-    <button id="answer1" onClick="checkAnswer(1)">1</button>
-    <button id="answer2" onClick="checkAnswer(2)">2</button>
-    <button id="answer3" onClick="checkAnswer(3)">3</button>
+    <div id="buttons">
+      <button id="answer0" onClick="checkAnswer(0)">0</button>
+      <button id="answer1" onClick="checkAnswer(1)">1</button>
+      <button id="answer2" onClick="checkAnswer(2)">2</button>
+      <button id="answer3" onClick="checkAnswer(3)">3</button>
+    </buttons>
     <div id="punishment"></div>
     <img id="gulpin-yap" src="https://raw.githubusercontent.com/SheePop-dev/trivia-master-gulpin/refs/heads/main/gulpin-yap.gif">
   </div>
 <script>
-// things to add 
-// shiny gulpin chance
-// fan-made trivia questions
-// list of punishments (TOTK Bingo: drop all weapons | unequip all armor for 10 minutes | transfer shiny pokemon to chat | increase chance of Gulpin by 5% permanently | next question is read in jumbled words | buy a salmon | give greg VIP | stop and help 3 koroks | shrine blindfolded | increase voice pitch by 1 octave | curse | bee movie | speak in spanish for 5 minutes | open tart packs | speeddraw a new tart card | Get 5 fish rn | Get first place in Mario Kart on 150cc | Do the next shrine you see | block half the screen | 
+var punishments_totk = [
+  "Drop all weapons", 
+  "No armor until next question", 
+  "Only move by jumping until the next question", 
+  "Stop what you're doing and help a Korok", 
+  "Stop what you're doing and complete a shrine", 
+  
+  "Speak Spanish until the next question", 
+  "Echo mic until next question",
+  "Stop what you're doing and draw a Tart Wars card", 
+  "Nitro giveaway", 
+  "Invert Switch colors", 
+  
+  "Block half the screen", 
+  "Complete a circuit or get first place in Mario Kart",
+  "Stop what you're doing and get a Bubbul Gem",
+  "Stop what you're doing and pet a dog",
+  "Stop what you're doing and defeat a miniboss",
+  
+  "Random Sporcle quiz until you get at least 75%",
+  "Do the VGBandle",
+  "Draw a random pokemon from memory",
+  "Chance of gulpin replacing words increased by 10%",
+  "Say a curse word",
+  
+  "Do the Wordle",
+  "Do the Globle",
+  "Win a Random Battle in Pokemon Showdown",
+  "Do a Dutch Duolingo lesson"
+];
 
-var punishments_totk = ["Drop all weapons", "No armor until next question", "Only move by jumping until the next question", "Stop what you're doing and help a Korok", "Stop what you're doing and complete a shrine", "Speak Spanish until the next question", "Increase voice by 1 octave until next question", "Stop what you're doing and draw a Tart Wars card"];
+var questionNumber = 0;
 var punishments_repeatable = [];
 
 speakText(0, "It's Question Time!");
 let correctAnswer = "";
 
 async function loadQuestion() {
+  questionNumber++;
   document.getElementById("answer0").style.display = "inline";
   document.getElementById("answer1").style.display = "inline";
   document.getElementById("answer2").style.display = "inline";
@@ -75,6 +109,7 @@ function checkAnswer(int) {
     result = "That's correct! You're safe. For now."
     playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/correct.mp3?raw=true");
   } else {
+    var rando = Math.floor(Math.random() * punishments_totk.length);
     result = "WRONG! The correct answer was " + correctAnswer + ". Your punishment is: " + punishments_totk[Math.floor(Math.random() * punishments_totk.length)];
     playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/incorrect.mp3?raw=true");
   }
