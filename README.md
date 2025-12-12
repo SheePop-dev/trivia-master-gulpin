@@ -87,7 +87,9 @@ Gulpin cry from [Pokémon Showdown](https://play.pokemonshowdown.com/)
 
 ## License
 
-Feel free to use this for whatever! It's just a silly trivia game.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+TL;DR: Feel free to use, modify, and distribute this however you want!
 
 ---
 
