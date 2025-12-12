@@ -11,6 +11,28 @@
 
 button {
   background: none;
+  cursor: pointer;
+  padding: 10px;
+  margin: 5px;
+  border: 2px solid white;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.correct {
+  background-color: rgba(0, 255, 0, 0.3);
+}
+
+.incorrect {
+  background-color: rgba(255, 0, 0, 0.3);
 }
 
 </style>
@@ -29,6 +51,7 @@ button {
     <div id="current-punishment" style="color:red; position: fixed; bottom: 0"></div>
     <img id="gulpin-yap" src="https://raw.githubusercontent.com/SheePop-dev/trivia-master-gulpin/refs/heads/main/gulpin-yap.gif">
   </div>
+<script src="fanmade-questions.js"></script>
 <script>
 var punishments_totk = [
   "Drop all weapons", 
@@ -74,12 +97,7 @@ var punishments_totk = [
   
 ];
 
-var fanmadeQuestionArray = [ 
-  ["categ1", "test test test test test test", "ans1", "ans2", "ans3", "ans4"],
-  ["categ2", "test test test test test test", "ans1", "ans2", "ans3", "ans4"],
-  ["categ3", "test test test test test test", "ans1", "ans2", "ans3", "ans4"]
-];
-  
+const originalPunishments = [...punishments_totk];
 
 var questionNumber = 4;
 var fanQuestionNumber = 0;
@@ -99,6 +117,19 @@ let all_answers = [];
 
 let currPunishment = "";
 
+// Better voice selection with fallback
+function getBestVoice() {
+  const voices = speechSynthesis.getVoices();
+  // Try to find a good English voice, fallback to first available
+  const englishVoice = voices.find(v => v.lang.startsWith('en'));
+  return englishVoice || voices[0];
+}
+
+// Ensure voices are loaded
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => {};
+}
+
 async function loadQuestion() {
   questionNumber++;
   currPunishment = "";
@@ -106,26 +137,55 @@ async function loadQuestion() {
   document.getElementById("answer1").style.display = "inline";
   document.getElementById("answer2").style.display = "inline";
   document.getElementById("answer3").style.display = "inline";
+  
+  // Remove previous highlighting
+  for(let i = 0; i < 4; i++) {
+    document.getElementById("answer" + i).classList.remove("correct", "incorrect");
+    document.getElementById("answer" + i).disabled = false;
+  }
+  
   document.getElementById("full").style.opacity = "1";
   document.getElementById("question").innerHTML = "";
   document.getElementById("punishment").innerHTML = "";
   document.getElementById("current-punishment").innerHTML = "";
   
   if (questionNumber < 4) {
-    res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
-    data = await res.json();
-    q = data.results[0];
-    category = decode(q.category);
-    question = decode(q.question);
-    correct_answer = decode(q.correct_answer);
-    correctAnswer = correct_answer;
-    all_answers = q.incorrect_answers.map(a => decode(a));
-    all_answers.push(correct_answer);
+    try {
+      res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
+      if (!res.ok) {
+        throw new Error('Failed to fetch question from API');
+      }
+      data = await res.json();
+      q = data.results[0];
+      category = decode(q.category);
+      question = decode(q.question);
+      correct_answer = decode(q.correct_answer);
+      correctAnswer = correct_answer;
+      all_answers = q.incorrect_answers.map(a => decode(a));
+      all_answers.push(correct_answer);
+    } catch (error) {
+      console.error('Error loading question:', error);
+      // Fallback to fanmade question if API fails
+      questionNumber = 4;
+      await loadQuestion();
+      return;
+    }
   } else {
+    if (fanQuestionNumber >= fanmadeQuestionArray.length) {
+      // Shuffle and restart fanmade questions when exhausted
+      fanQuestionNumber = 0;
+      fanmadeQuestionArray = shuffle([...fanmadeQuestionArray]);
+    }
+    
     category = fanmadeQuestionArray[fanQuestionNumber][0];
     question = fanmadeQuestionArray[fanQuestionNumber][1];
     correctAnswer = fanmadeQuestionArray[fanQuestionNumber][2];
-    all_answers = [ fanmadeQuestionArray[fanQuestionNumber][2], fanmadeQuestionArray[fanQuestionNumber][3], fanmadeQuestionArray[fanQuestionNumber][4], fanmadeQuestionArray[fanQuestionNumber][5] ];
+    all_answers = [ 
+      fanmadeQuestionArray[fanQuestionNumber][2], 
+      fanmadeQuestionArray[fanQuestionNumber][3], 
+      fanmadeQuestionArray[fanQuestionNumber][4], 
+      fanmadeQuestionArray[fanQuestionNumber][5] 
+    ];
     fanQuestionNumber++;
     questionNumber = 0;
   }
@@ -149,12 +209,32 @@ async function loadQuestion() {
 }
 
 function checkAnswer(int) {
+  // Disable all buttons
+  for(let i = 0; i < 4; i++) {
+    document.getElementById("answer" + i).disabled = true;
+  }
+  
   const selectedAnswer = document.getElementById("answer" + int).innerHTML;
   let result = "";
+  
+  // Highlight correct and incorrect answers
+  for(let i = 0; i < 4; i++) {
+    if (document.getElementById("answer" + i).innerHTML === correctAnswer) {
+      document.getElementById("answer" + i).classList.add("correct");
+    }
+  }
+  
   if (selectedAnswer == correctAnswer) {
     result = "That's correct! You're safe. For now."
     playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/correct.mp3?raw=true");
   } else {
+    document.getElementById("answer" + int).classList.add("incorrect");
+    
+    // Refill punishments if exhausted
+    if (punishments_totk.length === 0) {
+      punishments_totk = [...originalPunishments];
+    }
+    
     var rando = Math.floor(Math.random() * punishments_totk.length);
     currPunishment = punishments_totk[rando];
     result = "WRONG! The correct answer was " + correctAnswer;
@@ -191,11 +271,12 @@ function decode(val) {
 }
 
 function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
    }
-  return array;
+  return shuffled;
 }
 
 function playSound(url) {
@@ -220,8 +301,10 @@ function speakText(val, sentence) {
     if (i >= parts.length) return;
     const text = parts[i].trim();
     const utter = new SpeechSynthesisUtterance(text);
-    const voices = speechSynthesis.getVoices();
-    utter.voice = voices[3];
+    const voice = getBestVoice();
+    if (voice) {
+      utter.voice = voice;
+    }
     if (val == 1) {
       document.getElementById("question").innerHTML += text + " ";
     }
