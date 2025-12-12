@@ -106,7 +106,6 @@ var gulpinChance = .15;
 speakText(0, "It's Question Time!");
 let correctAnswer = "";
 
-
 let res;
 let data;
 let q;
@@ -117,15 +116,12 @@ let all_answers = [];
 
 let currPunishment = "";
 
-// Better voice selection with fallback
 function getBestVoice() {
   const voices = speechSynthesis.getVoices();
-  // Try to find a good English voice, fallback to first available
   const englishVoice = voices.find(v => v.lang.startsWith('en'));
   return englishVoice || voices[0];
 }
 
-// Ensure voices are loaded
 if (speechSynthesis.onvoiceschanged !== undefined) {
   speechSynthesis.onvoiceschanged = () => {};
 }
@@ -138,7 +134,6 @@ async function loadQuestion() {
   document.getElementById("answer2").style.display = "inline";
   document.getElementById("answer3").style.display = "inline";
   
-  // Remove previous highlighting
   for(let i = 0; i < 4; i++) {
     document.getElementById("answer" + i).classList.remove("correct", "incorrect");
     document.getElementById("answer" + i).disabled = false;
@@ -165,14 +160,12 @@ async function loadQuestion() {
       all_answers.push(correct_answer);
     } catch (error) {
       console.error('Error loading question:', error);
-      // Fallback to fanmade question if API fails
       questionNumber = 4;
       await loadQuestion();
       return;
     }
   } else {
     if (fanQuestionNumber >= fanmadeQuestionArray.length) {
-      // Shuffle and restart fanmade questions when exhausted
       fanQuestionNumber = 0;
       fanmadeQuestionArray = shuffle([...fanmadeQuestionArray]);
     }
@@ -209,7 +202,6 @@ async function loadQuestion() {
 }
 
 function checkAnswer(int) {
-  // Disable all buttons
   for(let i = 0; i < 4; i++) {
     document.getElementById("answer" + i).disabled = true;
   }
@@ -217,7 +209,6 @@ function checkAnswer(int) {
   const selectedAnswer = document.getElementById("answer" + int).innerHTML;
   let result = "";
   
-  // Highlight correct and incorrect answers
   for(let i = 0; i < 4; i++) {
     if (document.getElementById("answer" + i).innerHTML === correctAnswer) {
       document.getElementById("answer" + i).classList.add("correct");
@@ -230,7 +221,6 @@ function checkAnswer(int) {
   } else {
     document.getElementById("answer" + int).classList.add("incorrect");
     
-    // Refill punishments if exhausted
     if (punishments_totk.length === 0) {
       punishments_totk = [...originalPunishments];
     }
