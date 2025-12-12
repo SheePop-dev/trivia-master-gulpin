@@ -26,7 +26,9 @@ let fanmadeQuestionArray = [
   ["Xerneas Brothers", "Hi big fan ", "hi", "Formatting error", "‎ ", "biig fan"],
   ["Greg", "Who was my most watched YouTube according to recap 2025", "Yahiamice", "SheePop", "Markiplier", "Cinemassacre"],
   ["Greg", "What was the capital of the Mire Empire?", "The Mareep", "The Chessboard", "Our House", "The Villager's House"],
-  ["Geeg", "What flag is my favourite?", "Seychelles 🇸🇨", "St. Lucia 🇱🇨", "Ireland 🇮🇪", "St. Vincent and the Grenadines 🇻🇨"
+  ["Geeg", "What flag is my favourite?", "Seychelles 🇸🇨", "St. Lucia 🇱🇨", "Ireland 🇮🇪", "St. Vincent and the Grenadines 🇻🇨"],
   ["Greg", "What is my favourite anime?", "Dandadan", "Undead Unluck", "One Piece", "Dragon Ball Z"],
   ["Greg", "What is my favourite Tart Wars card?", "Tandoor", "IR Greg", "Tart Bombardment", "Pickles"],
+  ["Greg", "Which of the 4 Irish providences am I from?", "Munster", "Ulster", "Connacht", "Leinster"],
+  ["Greg", "Which of my purposful shiny hunts was the shortest?", "French Fries", "Petuni", "Axel", "Dune"],
 ];
