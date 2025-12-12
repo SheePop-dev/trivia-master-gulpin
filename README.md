@@ -1,15 +1,15 @@
 # Trivia Master Gulpin 🎮
 
-A fun trivia game with a Pokémon twist! Test your knowledge with questions from the Open Trivia Database, plus some custom questions thrown in for good measure. But watch out—get an answer wrong and Gulpin will assign you a punishment!
+A fun trivia game with a Pokémon twist! Test your knowledge with questions from the Open Trivia Database, plus some custom questions thrown in for good measure. But watch out get an answer wrong and Gulpin will assign you a punishment!
 
 ## What's This?
 
-This is a browser-based trivia game that combines general knowledge questions with fanmade ones. The catch? Every time you get something wrong, you face a random punishment (like dropping all your weapons in a game, doing a speedrun challenge, or speaking Spanish until the next question). And if you hear the word "GULPIN" a lot, that's intentional—it might even replace words in your questions!
+This is a browser-based trivia game that combines general knowledge questions with fanmade ones. The catch? Every time you get something wrong, you face a random punishment (like dropping all your weapons in a game, doing a speedrun challenge, or speaking Spanish until the next question). And if you hear the word "GULPIN" a lot, that's intentional it might even replace words in your questions!
 
 ## Features
 
 - **Mixed Question Sources**: Pulls from the Open Trivia Database API and cycles through custom questions
-- **Text-to-Speech**: Questions are read aloud with a fun twist—"GULPIN" gets replaced with an actual Gulpin cry
+- **Text-to-Speech**: Questions are read aloud with a fun twist "GULPIN" gets replaced with an actual Gulpin cry
 - **Random Punishments**: Wrong answers trigger creative punishments from a pool that gets refilled when exhausted
 - **Visual Feedback**: Correct answers turn green, wrong ones turn red
 - **Auto-Loading**: New questions load automatically every 7 minutes
@@ -17,7 +17,7 @@ This is a browser-based trivia game that combines general knowledge questions wi
 
 ## How to Play
 
-Just open `index.html` in your browser and you're good to go! No build steps, no dependencies—pure vanilla JavaScript.
+Just open `index.html` in your browser and you're good to go! No build steps, no dependencies pure vanilla JavaScript.
 
 1. Wait for the question to be read aloud
 2. Click one of the four answer buttons
