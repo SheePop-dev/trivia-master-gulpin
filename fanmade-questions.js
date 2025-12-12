@@ -12,7 +12,7 @@ var fanmadeQuestionArray = [
   ["Greg", "I ran out of ideas, fuck you", "This one?", "This one?", "This one?", "This one?"],
   ["Greg", "Which of these smash bros characters do I not like playing?", "Isabelle", "Hero", "Dr. Mario", "Little Mac"],
   ["Greg", "What is my name?", "Greg", "Robert", "Calvin", "Hɔkʰ ˈtʼɤ̂ː"],
-  ["Greg", "What game have I done speedruns for?" "Legend of Zelda: Link to the Past", "Hong Kong 97", "Minecraft", "Super Mario 64"],
+  ["Greg", "What game have I done speedruns for?", "Legend of Zelda: Link to the Past", "Hong Kong 97", "Minecraft", "Super Mario 64"],
   ["Greg", "Given that x is an event and x has a 1/300 chance of occuring, to 2 sf, what is the chance of x occuring ateast one if it is ran 333 times?", "67%", "100", "53%", "82%"],
   ["Greg", "Which of your friends is the best?", "Greg", "TripB85", "Horizon Llenida", "Hei'an Qingfu"],
   ["Greg", "Which instrument do I play?", "Piano", "Bari Sax", "Bb Trumpet", "Bass"],
@@ -20,27 +20,13 @@ var fanmadeQuestionArray = [
   ["Greg", "How many LaCroixs do you drink daily?", "Enough to incepacitate a victorian peasant", "like 6 or 7", "One", "Incorrect answer 3"],
   ["Greg", "Greg", "Greg", "Greg", "Greg", "Greg"],
   ["Greg", "Which of these African capital cities is my favourite?", "Ougadougou", "Mbabane", "N'djamena", "Paris"],
-  ["Greg", "What religion do i follow?" "Agnosticism", "Catholisism", "Judaism", "Sikhism"],
+  ["Greg", "What religion do i follow?", "Agnosticism", "Catholisism", "Judaism", "Sikhism"],
   ["Greg", "As of making this, how many shiny Pokémon have I caught total?", "10", "8", "6", "9"],
   ["Greg", "Have a freebie", "Don't pick this one", "Thank you Greg", "Don't pick this one", "Don't pick this one"],
-  ["Greg", "What is my nso friend code?" "1141-3601-2936", "1159-3725-9026", "1056-6892-1009", "877-CASH-NOW"],
+  ["Greg", "What is my nso friend code?", "1141-3601-2936", "1159-3725-9026", "1056-6892-1009", "877-CASH-NOW"],
   ["Xerneas Brothers", "Hi big fan ", "hi", "Formatting error", "‎ ", "biig fan"],
   ["Greg", "Who was my most watched YouTube according to recap 2025", "SheePop", "Yahiamice", "Markiplier", "Cinemassacre"],
   ["Greg", "What was the capital of the Mire Empire?", "The Mareep", "The Chessboard", "Our House", "The Villager's House"],
   ["Greg", "What is my favourite anime?", "Dandadan", "Undead Unluck", "One Piece", "Dragon Ball Z"],
   ["Greg", "What is my favourite Tart Wars card?", "Tandoor", "IR Greg", "Tart Bombardment", "Pickles"],
-  
-  
-
-
-
-
-
-
-
-
-
-  
-
-
 ];
