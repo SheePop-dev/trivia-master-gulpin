@@ -26,6 +26,7 @@ button {
       <button id="answer3" onClick="checkAnswer(3)">3</button>
     </buttons>
     <div id="punishment"></div>
+    <div id="current-punishment" style="color:red; position: fixed; bottom: 0"></div>
     <img id="gulpin-yap" src="https://raw.githubusercontent.com/SheePop-dev/trivia-master-gulpin/refs/heads/main/gulpin-yap.gif">
   </div>
 <script>
@@ -36,14 +37,14 @@ var punishments_totk = [
   "Stop what you're doing and help a Korok", 
   "Stop what you're doing and complete a shrine", 
   
-  "Teach Greg Spanish until the next question", 
+  "Speak Spanish until the next question", 
   "Echo mic until next question",
   "Stop what you're doing and draw a Tart Wars card", 
-  "Give Greg mod", 
+  "Nitro giveaway", 
   "Invert Switch colors", 
   
   "Block half the screen", 
-  "Complete a circuit or get first place in Mario Kart",
+  "Complete a race in Mario Kart",
   "Stop what you're doing and get a Bubbul Gem",
   "Stop what you're doing and pet a dog",
   "Stop what you're doing and defeat a miniboss",
@@ -56,27 +57,51 @@ var punishments_totk = [
   
   "Do the Wordle",
   "Do the Globle",
-  "Win a Random Battle in Pokemon Showdown",
+  "Do a Random Battle in Pokemon Showdown",
   "Do a Dutch Duolingo lesson",
-  "Tell chat a fun fact about you",
+  "Do a GBL battle in Pokemon Go",
   
   "Catch a fish",
   "Open a Tart Wars pack",
-  "Defeat Relicanth in SheePop vs Zarel",
+  "Battle Relicanth in SheePop vs Zarel",
   "Do the PokeRap",
-  "Go to the Great Sky Island until the next question"
+  "Go to the Depths until the next question",
   
+  "Do the PokeDoku",
+  "Do the Gamedle",
+  "Recite Steamed Hams from memory",
+  "Give chat a shiny Pokemon"
   
 ];
 
-var questionNumber = 0;
-var punishments_repeatable = [];
+var fanmadeQuestionArray = [ 
+  ["categ1", "test test test test test test", "ans1", "ans2", "ans3", "ans4"],
+  ["categ2", "test test test test test test", "ans1", "ans2", "ans3", "ans4"],
+  ["categ3", "test test test test test test", "ans1", "ans2", "ans3", "ans4"]
+];
+  
+
+var questionNumber = 4;
+var fanQuestionNumber = 0;
+var gulpinChance = .15;
 
 speakText(0, "It's Question Time!");
 let correctAnswer = "";
 
+
+let res;
+let data;
+let q;
+let category = "";
+let question = "";
+let correct_answer = "";
+let all_answers = [];
+
+let currPunishment = "";
+
 async function loadQuestion() {
   questionNumber++;
+  currPunishment = "";
   document.getElementById("answer0").style.display = "inline";
   document.getElementById("answer1").style.display = "inline";
   document.getElementById("answer2").style.display = "inline";
@@ -84,23 +109,35 @@ async function loadQuestion() {
   document.getElementById("full").style.opacity = "1";
   document.getElementById("question").innerHTML = "";
   document.getElementById("punishment").innerHTML = "";
-  const res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
-  const data = await res.json();
-  const q = data.results[0];
-  const category = decode(q.category);
-  const question = decode(q.question);
-  const correct_answer = decode(q.correct_answer);
-  correctAnswer = correct_answer;
-  speakText(0, "The category is " + category);
-  let all_answers = q.incorrect_answers.map(a => decode(a));
-  all_answers.push(correct_answer);
+  document.getElementById("current-punishment").innerHTML = "";
+  
+  if (questionNumber < 4) {
+    res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
+    data = await res.json();
+    q = data.results[0];
+    category = decode(q.category);
+    question = decode(q.question);
+    correct_answer = decode(q.correct_answer);
+    correctAnswer = correct_answer;
+    all_answers = q.incorrect_answers.map(a => decode(a));
+    all_answers.push(correct_answer);
+  } else {
+    category = fanmadeQuestionArray[fanQuestionNumber][0];
+    question = fanmadeQuestionArray[fanQuestionNumber][1];
+    correctAnswer = fanmadeQuestionArray[fanQuestionNumber][2];
+    all_answers = [ fanmadeQuestionArray[fanQuestionNumber][2], fanmadeQuestionArray[fanQuestionNumber][3], fanmadeQuestionArray[fanQuestionNumber][4], fanmadeQuestionArray[fanQuestionNumber][5] ];
+    fanQuestionNumber++;
+    questionNumber = 0;
+  }
+  
   all_answers = shuffle(all_answers);
+  speakText(0, "The category is " + category);
   document.getElementById("category").innerHTML = category;
   const questionWordsArray = question.split(" ");
   var i = 0;
   var gulpinQuestion = "";
   for(i=0;i<questionWordsArray.length;i++) {
-    if (Math.random() <= .20) {
+    if (Math.random() <= gulpinChance) {
       questionWordsArray[i] = "GULPIN";
     }
     gulpinQuestion += questionWordsArray[i] + " ";
@@ -108,7 +145,7 @@ async function loadQuestion() {
   speakText(1, gulpinQuestion);
   for(i=0;i<4;i++) {
     document.getElementById("answer" + i).innerHTML = all_answers[i];
-  }
+  }   
 }
 
 function checkAnswer(int) {
@@ -119,8 +156,14 @@ function checkAnswer(int) {
     playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/correct.mp3?raw=true");
   } else {
     var rando = Math.floor(Math.random() * punishments_totk.length);
-    result = "WRONG! The correct answer was " + correctAnswer + ". Your punishment is: " + punishments_totk[Math.floor(Math.random() * punishments_totk.length)];
+    currPunishment = punishments_totk[rando];
+    result = "WRONG! The correct answer was " + correctAnswer;
+    punishments_totk.splice(rando, 1);
     playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/incorrect.mp3?raw=true");
+    
+    if (currPunishment == "Chance of gulpin replacing words increased by 10%") {
+      gulpinChance += .1;
+    }
   }
   document.getElementById("punishment").innerHTML = result;
   document.getElementById("question").innerHTML = " ";
@@ -130,8 +173,14 @@ function checkAnswer(int) {
   document.getElementById("answer2").style.display = "none";
   document.getElementById("answer3").style.display = "none";
   speakText(0, result);
+  if (result != "That's correct! You're safe. For now.") {
+    speakText(0, ". Your punishment is: " + currPunishment);
+  }
   setTimeout(function() {
     document.getElementById("punishment").innerHTML = "";
+    if (result != "That's correct! You're safe. For now.") {
+      document.getElementById("current-punishment").innerHTML = "Current punishment: " + currPunishment;
+    }
   }, 5000);
 }
 
@@ -198,7 +247,7 @@ function speakText(val, sentence) {
 loadQuestion();
 setInterval(function() {
   loadQuestion();
-}, 300000);
+}, 420000);
 
 </script>
 </body>
