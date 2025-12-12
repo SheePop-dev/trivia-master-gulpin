@@ -1,54 +1,232 @@
 <!DOCTYPE html>
-<html>
-<style>
-* {
-  color: white;
-  text-shadow: black 2px 2px;
-  text-align: center;
-  transition-duration: 0.5s;
-  font-size: 120%;
-}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trivia Master Gulpin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-button {
-  background: none;
-  cursor: pointer;
-  padding: 10px;
-  margin: 5px;
-  border: 2px solid white;
-  border-radius: 5px;
-}
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
+    #full {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      color: white;
+      transition: opacity 0.5s;
+    }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+    #stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-.correct {
-  background-color: rgba(0, 255, 0, 0.3);
-}
+    .stat-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 0.9em;
+    }
 
-.incorrect {
-  background-color: rgba(255, 0, 0, 0.3);
-}
-</style>
+    .stat-item strong {
+      color: #ffd700;
+    }
 
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    #category {
+      font-size: 1.2em;
+      color: #ffd700;
+      margin-bottom: 20px;
+    }
+
+    #question {
+      font-size: 1.3em;
+      margin: 30px 0;
+      min-height: 60px;
+      line-height: 1.6;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    #buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .correct {
+      background: rgba(0, 255, 0, 0.3) !important;
+      border-color: #00ff00 !important;
+    }
+
+    .incorrect {
+      background: rgba(255, 0, 0, 0.3) !important;
+      border-color: #ff0000 !important;
+    }
+
+    #punishment, #current-punishment {
+      font-size: 1.2em;
+      margin: 20px 0;
+      min-height: 30px;
+    }
+
+    #current-punishment {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 0, 0, 0.8);
+      padding: 15px 30px;
+      border-radius: 10px;
+      max-width: 90%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    #gulpin-yap {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 150px;
+      height: auto;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    #controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 20px;
+      font-size: 0.9em;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #progress {
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    @media (max-width: 600px) {
+      #full {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+
+      #question {
+        font-size: 1.1em;
+      }
+
+      button {
+        font-size: 1em;
+        padding: 12px;
+      }
+
+      #gulpin-yap {
+        width: 100px;
+        bottom: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+</head>
 <body>
   <div id="full">
-    <h1 id="category">Category</h1>
-    <p id="question">question</p>
+    <div id="stats">
+      <div class="stat-item">🎯 Correct: <strong id="correct-count">0</strong></div>
+      <div class="stat-item">❌ Wrong: <strong id="wrong-count">0</strong></div>
+      <div class="stat-item">📈 Score: <strong id="score">0%</strong></div>
+      <div class="stat-item">🎲 Gulpin: <strong id="gulpin-percent">15%</strong></div>
+    </div>
+    <h1 id="category">Loading...</h1>
+    <p id="question">Preparing your first question...</p>
     <div id="buttons">
-      <button id="answer0" onClick="checkAnswer(0)">0</button>
-      <button id="answer1" onClick="checkAnswer(1)">1</button>
-      <button id="answer2" onClick="checkAnswer(2)">2</button>
-      <button id="answer3" onClick="checkAnswer(3)">3</button>
+      <button id="answer0" onclick="checkAnswer(0)"></button>
+      <button id="answer1" onclick="checkAnswer(1)"></button>
+      <button id="answer2" onclick="checkAnswer(2)"></button>
+      <button id="answer3" onclick="checkAnswer(3)"></button>
     </div>
     <div id="punishment"></div>
-    <div id="current-punishment" style="color:red; position: fixed; bottom: 0"></div>
-    <img id="gulpin-yap" src="https://raw.githubusercontent.com/SheePop-dev/trivia-master-gulpin/refs/heads/main/gulpin-yap.gif">
+    <div id="controls">
+      <button class="control-btn" onclick="toggleSound()" id="sound-btn">🔊 Sound: ON</button>
+      <button class="control-btn" onclick="skipQuestion()">⏭️ Skip Question</button>
+    </div>
+    <div id="progress">Question type: API</div>
+    <div id="current-punishment"></div>
+    <img id="gulpin-yap" src="https://raw.githubusercontent.com/SheePop-dev/trivia-master-gulpin/refs/heads/main/gulpin-yap.gif" alt="Gulpin">
   </div>
 <script src="fanmade-questions.js"></script>
 <script>
@@ -100,7 +278,10 @@ let fanQuestionNumber = 0;
 let gulpinChance = BASE_GULPIN_CHANCE;
 let correctAnswer = "";
 let currentPunishment = "";
-let currentQuestion = { category: "", question: "", answers: [] };
+let correctCount = 0;
+let wrongCount = 0;
+let soundEnabled = true;
+let questionInterval;
 
 const elements = {
   category: document.getElementById("category"),
@@ -109,10 +290,14 @@ const elements = {
   currentPunishment: document.getElementById("current-punishment"),
   gulpinYap: document.getElementById("gulpin-yap"),
   answers: [0, 1, 2, 3].map(i => document.getElementById("answer" + i)),
-  full: document.getElementById("full")
+  full: document.getElementById("full"),
+  correctCount: document.getElementById("correct-count"),
+  wrongCount: document.getElementById("wrong-count"),
+  score: document.getElementById("score"),
+  gulpinPercent: document.getElementById("gulpin-percent"),
+  progress: document.getElementById("progress"),
+  soundBtn: document.getElementById("sound-btn")
 };
-
-speakText(0, "It's Question Time!");
 
 function getBestVoice() {
   const voices = speechSynthesis.getVoices();
@@ -120,7 +305,38 @@ function getBestVoice() {
 }
 
 if (speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = () => {};
+  speechSynthesis.onvoiceschanged = getBestVoice;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key >= '1' && e.key <= '4') {
+    const index = parseInt(e.key) - 1;
+    if (!elements.answers[index].disabled) {
+      checkAnswer(index);
+    }
+  }
+});
+
+function updateStats() {
+  elements.correctCount.textContent = correctCount;
+  elements.wrongCount.textContent = wrongCount;
+  const total = correctCount + wrongCount;
+  const percentage = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+  elements.score.textContent = percentage + "%";
+  elements.gulpinPercent.textContent = Math.round(gulpinChance * 100) + "%";
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  elements.soundBtn.textContent = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+}
+
+function skipQuestion() {
+  if (confirm("Skip this question? (Will count as wrong)")) {
+    wrongCount++;
+    updateStats();
+    loadQuestion();
+  }
 }
 
 async function loadQuestion() {
@@ -131,20 +347,24 @@ async function loadQuestion() {
     btn.style.display = "inline";
     btn.classList.remove("correct", "incorrect");
     btn.disabled = false;
+    btn.textContent = "";
   });
   
   elements.full.style.opacity = "1";
-  elements.question.innerHTML = "";
+  elements.question.innerHTML = '<div class="loading"></div>';
   elements.punishment.innerHTML = "";
   elements.currentPunishment.innerHTML = "";
+  elements.category.textContent = "Loading...";
   
   let category, question, answers;
   
   if (questionNumber < API_QUESTION_CYCLE) {
+    elements.progress.textContent = `Question type: API (${questionNumber + 1}/${API_QUESTION_CYCLE})`;
     try {
       const res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
       if (!res.ok) throw new Error('API fetch failed');
       const data = await res.json();
+      if (!data.results || data.results.length === 0) throw new Error('No results');
       const q = data.results[0];
       category = decode(q.category);
       question = decode(q.question);
@@ -152,10 +372,13 @@ async function loadQuestion() {
       answers = [...q.incorrect_answers.map(decode), correctAnswer];
     } catch (error) {
       console.error('Error loading question:', error);
+      elements.question.textContent = "Failed to load question. Loading fanmade instead...";
       questionNumber = API_QUESTION_CYCLE;
-      return loadQuestion();
+      setTimeout(() => loadQuestion(), 1000);
+      return;
     }
   } else {
+    elements.progress.textContent = "Question type: Fanmade";
     if (fanQuestionNumber >= fanmadeQuestionArray.length) {
       fanQuestionNumber = 0;
       fanmadeQuestionArray = shuffle([...fanmadeQuestionArray]);
@@ -171,32 +394,42 @@ async function loadQuestion() {
   }
   
   answers = shuffle(answers);
-  speakText(0, "The category is " + category);
-  elements.category.innerHTML = category;
+  if (soundEnabled) {
+    speakText(0, "The category is " + category);
+  }
+  elements.category.textContent = category;
   
   const gulpinQuestion = question.split(" ")
     .map(word => Math.random() <= gulpinChance ? "GULPIN" : word)
     .join(" ");
   
-  speakText(1, gulpinQuestion);
-  elements.answers.forEach((btn, i) => btn.innerHTML = answers[i]);   
+  if (soundEnabled) {
+    speakText(1, gulpinQuestion);
+  } else {
+    elements.question.textContent = gulpinQuestion;
+  }
+  elements.answers.forEach((btn, i) => btn.textContent = answers[i]);   
 }
 
 function checkAnswer(index) {
   const CORRECT_MSG = "That's correct! You're safe. For now.";
   
   elements.answers.forEach(btn => btn.disabled = true);
-  const selectedAnswer = elements.answers[index].innerHTML;
+  const selectedAnswer = elements.answers[index].textContent;
   
   elements.answers.forEach(btn => {
-    if (btn.innerHTML === correctAnswer) btn.classList.add("correct");
+    if (btn.textContent === correctAnswer) btn.classList.add("correct");
   });
   
   let result;
   if (selectedAnswer === correctAnswer) {
+    correctCount++;
     result = CORRECT_MSG;
-    playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/correct.mp3?raw=true");
+    if (soundEnabled) {
+      playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/correct.mp3?raw=true");
+    }
   } else {
+    wrongCount++;
     elements.answers[index].classList.add("incorrect");
     
     if (punishments.length === 0) punishments = [...originalPunishments];
@@ -204,27 +437,32 @@ function checkAnswer(index) {
     const randomIndex = Math.floor(Math.random() * punishments.length);
     currentPunishment = punishments.splice(randomIndex, 1)[0];
     result = "WRONG! The correct answer was " + correctAnswer;
-    playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/incorrect.mp3?raw=true");
+    if (soundEnabled) {
+      playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/incorrect.mp3?raw=true");
+    }
     
     if (currentPunishment === "Chance of gulpin replacing words increased by 10%") {
       gulpinChance += 0.1;
     }
   }
   
-  elements.punishment.innerHTML = result;
-  elements.question.innerHTML = " ";
-  elements.category.innerHTML = " ";
+  updateStats();
+  elements.punishment.textContent = result;
+  elements.question.textContent = " ";
+  elements.category.textContent = " ";
   elements.answers.forEach(btn => btn.style.display = "none");
   
-  speakText(0, result);
-  if (result !== CORRECT_MSG) {
-    speakText(0, ". Your punishment is: " + currentPunishment);
+  if (soundEnabled) {
+    speakText(0, result);
+    if (result !== CORRECT_MSG) {
+      speakText(0, ". Your punishment is: " + currentPunishment);
+    }
   }
   
   setTimeout(() => {
-    elements.punishment.innerHTML = "";
+    elements.punishment.textContent = "";
     if (result !== CORRECT_MSG) {
-      elements.currentPunishment.innerHTML = "Current punishment: " + currentPunishment;
+      elements.currentPunishment.textContent = "Current punishment: " + currentPunishment;
     }
   }, 5000);
 }
@@ -254,6 +492,8 @@ function playSound(url) {
 }
 
 function speakText(showOnScreen, sentence) {
+  if (!sentence || sentence.trim() === "") return;
+  
   const GULPIN_CRY = new Audio("https://play.pokemonshowdown.com/audio/cries/gulpin.mp3");
   const parts = sentence.split("GULPIN");
   let partIndex = 0;
@@ -262,34 +502,51 @@ function speakText(showOnScreen, sentence) {
     if (partIndex >= parts.length) return;
     
     const text = parts[partIndex].trim();
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voice = getBestVoice();
-    if (voice) utterance.voice = voice;
-    
-    if (showOnScreen === 1) {
-      elements.question.innerHTML += text + " ";
-    }
-    
-    utterance.onstart = () => elements.gulpinYap.style.opacity = "1";
-    utterance.onend = () => {
+    if (text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voice = getBestVoice();
+      if (voice) utterance.voice = voice;
+      
+      if (showOnScreen === 1) {
+        elements.question.textContent += text + " ";
+      }
+      
+      utterance.onstart = () => elements.gulpinYap.style.opacity = "1";
+      utterance.onend = () => {
+        partIndex++;
+        if (partIndex < parts.length) {
+          GULPIN_CRY.onended = speakNextPart;
+          if (showOnScreen === 1) {
+            elements.question.textContent += "GULPIN ";
+          }
+          GULPIN_CRY.play().catch(() => speakNextPart());
+        } else {
+          elements.gulpinYap.style.opacity = "0";
+        }
+      };
+      
+      speechSynthesis.speak(utterance);
+    } else {
       partIndex++;
       if (partIndex < parts.length) {
         GULPIN_CRY.onended = speakNextPart;
-        elements.question.innerHTML += "GULPIN ";
-        GULPIN_CRY.play();
+        if (showOnScreen === 1) {
+          elements.question.textContent += "GULPIN ";
+        }
+        GULPIN_CRY.play().catch(() => speakNextPart());
       } else {
         elements.gulpinYap.style.opacity = "0";
       }
-    };
-    
-    speechSynthesis.speak(utterance);
+    }
   }
   
   speakNextPart();
 }
 
-loadQuestion();
-setInterval(loadQuestion, QUESTION_INTERVAL_MS);
+setTimeout(() => {
+  loadQuestion();
+  questionInterval = setInterval(loadQuestion, QUESTION_INTERVAL_MS);
+}, 1000);
 
 </script>
 </body>
