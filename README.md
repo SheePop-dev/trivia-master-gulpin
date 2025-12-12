@@ -2,6 +2,14 @@
 
 A fun trivia game with a Pokémon twist! Test your knowledge with questions from the Open Trivia Database, plus some custom questions thrown in for good measure. But watch out get an answer wrong and Gulpin will assign you a punishment!
 
+## 🕹️ Play Now
+
+<!-- Uncomment this line when you deploy to GitHub Pages:
+**[Play the game here!](https://sheepop-dev.github.io/trivia-master-gulpin/)**
+-->
+
+> **Want to host this?** Go to your repository Settings > Pages > Source: Deploy from a branch > Select `main` branch > Save. Your game will be live at `https://sheepop-dev.github.io/trivia-master-gulpin/` in a few minutes!
+
 ## What's This?
 
 This is a browser-based trivia game that combines general knowledge questions with fanmade ones. The catch? Every time you get something wrong, you face a random punishment (like dropping all your weapons in a game, doing a speedrun challenge, or speaking Spanish until the next question). And if you hear the word "GULPIN" a lot, that's intentional it might even replace words in your questions!
