@@ -8,7 +8,7 @@ A fun trivia game with a Pokémon twist! Test your knowledge with questions from
 **[Play the game here!](https://sheepop-dev.github.io/trivia-master-gulpin/)**
 -->
 
-> **Want to host this?** Go to your repository Settings > Pages > Source: Deploy from a branch > Select `main` branch > Save. Your game will be live at `https://sheepop-dev.github.io/trivia-master-gulpin/` in a few minutes!
+> NOTE FOR ONWER **Want to host this?** Go to your repository Settings > Pages > Source: Deploy from a branch > Select `main` branch > Save. Your game will be live at `https://sheepop-dev.github.io/trivia-master-gulpin/` in a few minutes!
 
 ## What's This?
 
