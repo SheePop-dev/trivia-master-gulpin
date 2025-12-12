@@ -34,7 +34,6 @@ button:disabled {
 .incorrect {
   background-color: rgba(255, 0, 0, 0.3);
 }
-
 </style>
 
 <body>
@@ -46,80 +45,78 @@ button:disabled {
       <button id="answer1" onClick="checkAnswer(1)">1</button>
       <button id="answer2" onClick="checkAnswer(2)">2</button>
       <button id="answer3" onClick="checkAnswer(3)">3</button>
-    </buttons>
+    </div>
     <div id="punishment"></div>
     <div id="current-punishment" style="color:red; position: fixed; bottom: 0"></div>
     <img id="gulpin-yap" src="https://raw.githubusercontent.com/SheePop-dev/trivia-master-gulpin/refs/heads/main/gulpin-yap.gif">
   </div>
 <script src="fanmade-questions.js"></script>
 <script>
-var punishments_totk = [
+let punishments = [
   "Drop all weapons", 
   "No armor until next question", 
   "Only move by jumping until the next question", 
   "Stop what you're doing and help a Korok", 
   "Stop what you're doing and complete a shrine", 
-  
   "Speak Spanish until the next question", 
   "Echo mic until next question",
   "Stop what you're doing and draw a Tart Wars card", 
   "Nitro giveaway", 
   "Invert Switch colors", 
-  
   "Block half the screen", 
   "Complete a race in Mario Kart",
   "Stop what you're doing and get a Bubbul Gem",
   "Stop what you're doing and pet a dog",
   "Stop what you're doing and defeat a miniboss",
-  
   "Random Sporcle quiz until you get at least 75%",
   "Do the VGBandle",
   "Draw a random pokemon from memory",
   "Chance of gulpin replacing words increased by 10%",
   "Say a curse word",
-  
   "Do the Wordle",
   "Do the Globle",
   "Do a Random Battle in Pokemon Showdown",
   "Do a Dutch Duolingo lesson",
   "Do a GBL battle in Pokemon Go",
-  
   "Catch a fish",
   "Open a Tart Wars pack",
   "Battle Relicanth in SheePop vs Zarel",
   "Do the PokeRap",
   "Go to the Depths until the next question",
-  
   "Do the PokeDoku",
   "Do the Gamedle",
   "Recite Steamed Hams from memory",
   "Give chat a shiny Pokemon"
-  
 ];
 
-const originalPunishments = [...punishments_totk];
+const originalPunishments = [...punishments];
 
-var questionNumber = 4;
-var fanQuestionNumber = 0;
-var gulpinChance = .15;
+const API_QUESTION_CYCLE = 4;
+const QUESTION_INTERVAL_MS = 420000;
+const BASE_GULPIN_CHANCE = 0.15;
+
+let questionNumber = API_QUESTION_CYCLE;
+let fanQuestionNumber = 0;
+let gulpinChance = BASE_GULPIN_CHANCE;
+let correctAnswer = "";
+let currentPunishment = "";
+let currentQuestion = { category: "", question: "", answers: [] };
+
+const elements = {
+  category: document.getElementById("category"),
+  question: document.getElementById("question"),
+  punishment: document.getElementById("punishment"),
+  currentPunishment: document.getElementById("current-punishment"),
+  gulpinYap: document.getElementById("gulpin-yap"),
+  answers: [0, 1, 2, 3].map(i => document.getElementById("answer" + i)),
+  full: document.getElementById("full")
+};
 
 speakText(0, "It's Question Time!");
-let correctAnswer = "";
-
-let res;
-let data;
-let q;
-let category = "";
-let question = "";
-let correct_answer = "";
-let all_answers = [];
-
-let currPunishment = "";
 
 function getBestVoice() {
   const voices = speechSynthesis.getVoices();
-  const englishVoice = voices.find(v => v.lang.startsWith('en'));
-  return englishVoice || voices[0];
+  return voices.find(v => v.lang.startsWith('en')) || voices[0];
 }
 
 if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -128,41 +125,35 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 
 async function loadQuestion() {
   questionNumber++;
-  currPunishment = "";
-  document.getElementById("answer0").style.display = "inline";
-  document.getElementById("answer1").style.display = "inline";
-  document.getElementById("answer2").style.display = "inline";
-  document.getElementById("answer3").style.display = "inline";
+  currentPunishment = "";
   
-  for(let i = 0; i < 4; i++) {
-    document.getElementById("answer" + i).classList.remove("correct", "incorrect");
-    document.getElementById("answer" + i).disabled = false;
-  }
+  elements.answers.forEach(btn => {
+    btn.style.display = "inline";
+    btn.classList.remove("correct", "incorrect");
+    btn.disabled = false;
+  });
   
-  document.getElementById("full").style.opacity = "1";
-  document.getElementById("question").innerHTML = "";
-  document.getElementById("punishment").innerHTML = "";
-  document.getElementById("current-punishment").innerHTML = "";
+  elements.full.style.opacity = "1";
+  elements.question.innerHTML = "";
+  elements.punishment.innerHTML = "";
+  elements.currentPunishment.innerHTML = "";
   
-  if (questionNumber < 4) {
+  let category, question, answers;
+  
+  if (questionNumber < API_QUESTION_CYCLE) {
     try {
-      res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
-      if (!res.ok) {
-        throw new Error('Failed to fetch question from API');
-      }
-      data = await res.json();
-      q = data.results[0];
+      const res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
+      if (!res.ok) throw new Error('API fetch failed');
+      const data = await res.json();
+      const q = data.results[0];
       category = decode(q.category);
       question = decode(q.question);
-      correct_answer = decode(q.correct_answer);
-      correctAnswer = correct_answer;
-      all_answers = q.incorrect_answers.map(a => decode(a));
-      all_answers.push(correct_answer);
+      correctAnswer = decode(q.correct_answer);
+      answers = [...q.incorrect_answers.map(decode), correctAnswer];
     } catch (error) {
       console.error('Error loading question:', error);
-      questionNumber = 4;
-      await loadQuestion();
-      return;
+      questionNumber = API_QUESTION_CYCLE;
+      return loadQuestion();
     }
   } else {
     if (fanQuestionNumber >= fanmadeQuestionArray.length) {
@@ -170,102 +161,86 @@ async function loadQuestion() {
       fanmadeQuestionArray = shuffle([...fanmadeQuestionArray]);
     }
     
-    category = fanmadeQuestionArray[fanQuestionNumber][0];
-    question = fanmadeQuestionArray[fanQuestionNumber][1];
-    correctAnswer = fanmadeQuestionArray[fanQuestionNumber][2];
-    all_answers = [ 
-      fanmadeQuestionArray[fanQuestionNumber][2], 
-      fanmadeQuestionArray[fanQuestionNumber][3], 
-      fanmadeQuestionArray[fanQuestionNumber][4], 
-      fanmadeQuestionArray[fanQuestionNumber][5] 
-    ];
+    const q = fanmadeQuestionArray[fanQuestionNumber];
+    category = q[0];
+    question = q[1];
+    correctAnswer = q[2];
+    answers = q.slice(2, 6);
     fanQuestionNumber++;
     questionNumber = 0;
   }
   
-  all_answers = shuffle(all_answers);
+  answers = shuffle(answers);
   speakText(0, "The category is " + category);
-  document.getElementById("category").innerHTML = category;
-  const questionWordsArray = question.split(" ");
-  var i = 0;
-  var gulpinQuestion = "";
-  for(i=0;i<questionWordsArray.length;i++) {
-    if (Math.random() <= gulpinChance) {
-      questionWordsArray[i] = "GULPIN";
-    }
-    gulpinQuestion += questionWordsArray[i] + " ";
-  }
+  elements.category.innerHTML = category;
+  
+  const gulpinQuestion = question.split(" ")
+    .map(word => Math.random() <= gulpinChance ? "GULPIN" : word)
+    .join(" ");
+  
   speakText(1, gulpinQuestion);
-  for(i=0;i<4;i++) {
-    document.getElementById("answer" + i).innerHTML = all_answers[i];
-  }   
+  elements.answers.forEach((btn, i) => btn.innerHTML = answers[i]);   
 }
 
-function checkAnswer(int) {
-  for(let i = 0; i < 4; i++) {
-    document.getElementById("answer" + i).disabled = true;
-  }
+function checkAnswer(index) {
+  const CORRECT_MSG = "That's correct! You're safe. For now.";
   
-  const selectedAnswer = document.getElementById("answer" + int).innerHTML;
-  let result = "";
+  elements.answers.forEach(btn => btn.disabled = true);
+  const selectedAnswer = elements.answers[index].innerHTML;
   
-  for(let i = 0; i < 4; i++) {
-    if (document.getElementById("answer" + i).innerHTML === correctAnswer) {
-      document.getElementById("answer" + i).classList.add("correct");
-    }
-  }
+  elements.answers.forEach(btn => {
+    if (btn.innerHTML === correctAnswer) btn.classList.add("correct");
+  });
   
-  if (selectedAnswer == correctAnswer) {
-    result = "That's correct! You're safe. For now."
+  let result;
+  if (selectedAnswer === correctAnswer) {
+    result = CORRECT_MSG;
     playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/correct.mp3?raw=true");
   } else {
-    document.getElementById("answer" + int).classList.add("incorrect");
+    elements.answers[index].classList.add("incorrect");
     
-    if (punishments_totk.length === 0) {
-      punishments_totk = [...originalPunishments];
-    }
+    if (punishments.length === 0) punishments = [...originalPunishments];
     
-    var rando = Math.floor(Math.random() * punishments_totk.length);
-    currPunishment = punishments_totk[rando];
+    const randomIndex = Math.floor(Math.random() * punishments.length);
+    currentPunishment = punishments.splice(randomIndex, 1)[0];
     result = "WRONG! The correct answer was " + correctAnswer;
-    punishments_totk.splice(rando, 1);
     playSound("https://github.com/SheePop-dev/trivia-master-gulpin/blob/main/incorrect.mp3?raw=true");
     
-    if (currPunishment == "Chance of gulpin replacing words increased by 10%") {
-      gulpinChance += .1;
+    if (currentPunishment === "Chance of gulpin replacing words increased by 10%") {
+      gulpinChance += 0.1;
     }
   }
-  document.getElementById("punishment").innerHTML = result;
-  document.getElementById("question").innerHTML = " ";
-  document.getElementById("category").innerHTML = " ";
-  document.getElementById("answer0").style.display = "none";
-  document.getElementById("answer1").style.display = "none";
-  document.getElementById("answer2").style.display = "none";
-  document.getElementById("answer3").style.display = "none";
+  
+  elements.punishment.innerHTML = result;
+  elements.question.innerHTML = " ";
+  elements.category.innerHTML = " ";
+  elements.answers.forEach(btn => btn.style.display = "none");
+  
   speakText(0, result);
-  if (result != "That's correct! You're safe. For now.") {
-    speakText(0, ". Your punishment is: " + currPunishment);
+  if (result !== CORRECT_MSG) {
+    speakText(0, ". Your punishment is: " + currentPunishment);
   }
-  setTimeout(function() {
-    document.getElementById("punishment").innerHTML = "";
-    if (result != "That's correct! You're safe. For now.") {
-      document.getElementById("current-punishment").innerHTML = "Current punishment: " + currPunishment;
+  
+  setTimeout(() => {
+    elements.punishment.innerHTML = "";
+    if (result !== CORRECT_MSG) {
+      elements.currentPunishment.innerHTML = "Current punishment: " + currentPunishment;
     }
   }, 5000);
 }
 
-function decode(val) {
-  const text = document.createElement("textarea");
-  text.innerHTML = val;
-  return text.value;
+function decode(html) {
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = html;
+  return textarea.value;
 }
 
 function shuffle(array) {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-   }
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   return shuffled;
 }
 
@@ -278,49 +253,43 @@ function playSound(url) {
   });
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function speakText(val, sentence) {
-  const keyword = "GULPIN";
-  const audio = new Audio("https://play.pokemonshowdown.com/audio/cries/gulpin.mp3");
-  const parts = sentence.split(keyword);
-  let i = 0;
-  function next() {
-    if (i >= parts.length) return;
-    const text = parts[i].trim();
-    const utter = new SpeechSynthesisUtterance(text);
-    const voice = getBestVoice();
-    if (voice) {
-      utter.voice = voice;
-    }
-    if (val == 1) {
-      document.getElementById("question").innerHTML += text + " ";
-    }
-    utter.onstart = () => {
-      document.getElementById("gulpin-yap").style.opacity = "1";
-    };
+function speakText(showOnScreen, sentence) {
+  const GULPIN_CRY = new Audio("https://play.pokemonshowdown.com/audio/cries/gulpin.mp3");
+  const parts = sentence.split("GULPIN");
+  let partIndex = 0;
+  
+  function speakNextPart() {
+    if (partIndex >= parts.length) return;
     
-    utter.onend = () => {
-      i++;
-      if (i < parts.length) {
-        audio.onended = next;
-        document.getElementById("question").innerHTML += "GULPIN ";
-        audio.play();
+    const text = parts[partIndex].trim();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = getBestVoice();
+    if (voice) utterance.voice = voice;
+    
+    if (showOnScreen === 1) {
+      elements.question.innerHTML += text + " ";
+    }
+    
+    utterance.onstart = () => elements.gulpinYap.style.opacity = "1";
+    utterance.onend = () => {
+      partIndex++;
+      if (partIndex < parts.length) {
+        GULPIN_CRY.onended = speakNextPart;
+        elements.question.innerHTML += "GULPIN ";
+        GULPIN_CRY.play();
       } else {
-        document.getElementById("gulpin-yap").style.opacity = "0";
+        elements.gulpinYap.style.opacity = "0";
       }
     };
-    speechSynthesis.speak(utter);
+    
+    speechSynthesis.speak(utterance);
   }
-  next();
+  
+  speakNextPart();
 }
 
 loadQuestion();
-setInterval(function() {
-  loadQuestion();
-}, 420000);
+setInterval(loadQuestion, QUESTION_INTERVAL_MS);
 
 </script>
 </body>
