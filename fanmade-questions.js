@@ -1,13 +1,6 @@
 // Questions should be in the format below
 // ["category", "question", "correct answer", "incorrect answer 1", "incorrect answer 2", "incorrect answer 3"],
 let fanmadeQuestionArray = [ 
-  ["Greg", "Which of these Pokémon do i not have as a plush?", "Grookey", "Piplup", "Leafeon", "Quagsire"],
-  ["Greg", "Which dino is my favourite?", "Quetzalcoatlus", "T-rex", "Ankylosaurus", "Velociraptor"],
-  ["Greg", "Would you still love me if i were a worm?", "Yes", "No", "Maybe", "67"],
-  ["Greg", "What is the name of my little drawing", "Norbert", "Geoffery", "Franklin", "Fitzgerald"],
-  ["Greg", "Which of these is not my tag somewhere", "TheGregariousGreg", "RGregariousGreg", "Real_Gregarious_Greg", "NefariousNed"],
-  ["Greg", "As of making this, how many yt subs do i have?", "137", "153", "167", "126"],
-  ["Greg", "What is my prefered way of having an egg?", "Poached", "Sunnyside up", "Hard-boiled", "Scrambled"],
   ["Greg", "I ran out of ideas, fuck you", "This one?", "This one?", "This one?", "This one?"],
   ["Greg", "Which of these smash bros characters do I not like playing?", "Isabelle", "Hero", "Dr. Mario", "Little Mac"],
   ["Greg", "What is my name?", "Greg", "Robert", "Calvin", "Hɔkʰ ˈtʼɤ̂ː"],
@@ -34,4 +27,5 @@ let fanmadeQuestionArray = [
   ["Greg", "Which US President is my favourite?", "Barack H. Obama", "Ulysses S. Grant", "Donald J. Trump", "Dwight D. Eisenhower"],
   ["Greg", "What is my favourite pasta shape?", "Tagliatelle", "Spaghetti", "Macaroni", "Rigatoni"],
   ["Greg", "Which country do I not have a friend from?", "South Africa", "Lithuania", "Italy", "Guatamala"]
+  ["Geography", "Which US State is Eau Claire in?", "Wisconisn", "Illinois", "Wyoming", "Michigan"]
 ];
